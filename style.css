@@ -105,6 +105,14 @@ nav {
     display: grid;
 }
 
+.calculator__main li {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .calculator__operators_top,
 .calculator__operators_right,
 .calculator__numbers {
@@ -121,8 +129,12 @@ nav {
     padding: 1em;
 }
 
+.calculator__display_operation {
+    color: #4d4d57;
+}
+
 .calculator__display_result {
-    font-size: 2.7em;
+    font-size: 2.5em;
 }
 
 .calculator__operators_top,
@@ -135,11 +147,6 @@ nav {
 
 .calculator__operators_equal {
     background-color: #343341;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .calculator__operators_divide,
