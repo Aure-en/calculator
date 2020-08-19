@@ -22,7 +22,6 @@ function input(event) {
         return;
     }
 
-
         //Default
     operation += event.target.innerHTML;  
     fixInput();
@@ -252,10 +251,30 @@ function drag(event) {
 
 }
 
+function replaceCalculator(event) {
+
+    let left = parseInt(calculatorWindow.style.left);
+    if (left < 0) left = 0;
+    if (left > document.documentElement.clientWidth - calculatorWindow.offsetWidth) left = document.documentElement.clientWidth - calculatorWindow.offsetWidth;
+
+    let top = parseInt(calculatorWindow.style.top);
+    if (top < 0) top = 0;
+    if (top > document.documentElement.clientHeight - calculatorWindow.offsetHeight) top = document.documentElement.clientHeight - calculatorWindow.offsetHeight;
+
+    calculatorWindow.style.left = left + 'px';
+    calculatorWindow.style.top = top + 'px';
+
+}
+
 /*Event Listeners*/
 
+    //Input operators/operandes when pressing keys
 calculator.addEventListener("click", input);
 
+    //Prevent the text from being selected when pressing keys
+document.querySelectorAll('li').forEach( li => li.onmousedown = function(e) { e.preventDefault(); });
+
+    //Resize calculator
 document.querySelector('#pemdas').addEventListener("change", togglePEMDAS);
 document.querySelector('.calculator__menu_maximize').addEventListener("click", maximize);
 document.querySelector('.calculator__menu_minimize').addEventListener("click", minimize);
@@ -264,7 +283,9 @@ document.querySelector('.calculator__header').addEventListener("dblclick", funct
     maximize();
 });
 
-document.querySelectorAll('li').forEach( li => li.onmousedown = function(e) { e.preventDefault(); });
-
+    //Move the calculator
 document.querySelector('.calculator__header').addEventListener("mousedown", drag);
 calculatorWindow.ondragstart = function() { return false; };
+
+    //Replace the calculator when the window is resized.
+window.addEventListener("resize", replaceCalculator);
