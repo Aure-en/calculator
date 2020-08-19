@@ -119,6 +119,12 @@ function clear() {
 
 function equal() {
 
+    if (operation == '=') {
+        operation = '';
+        displayResult('');
+        return;
+    }
+
     if (!checkOperation(operation)) {
         displayResult("Error: cannot divide by 0.");
         result = 0;
@@ -148,6 +154,10 @@ function fixInput() {
         .replace(/([+÷✕‒%])\./, '$1',) // A "." following an operator is replaced by "0."
         .replace(/(^|[+÷✕‒%])0+([0-9])/, '$1$2') // If there are some "0" before a number, they are deleted.
         .replace(/0\.=/, '0=') // If "=" follows "0.", it is replaced by "0".
+        .replace(/±{2,}/, '±') // Only allows 1 "-" in front of each number.
+        .replace(/±=/, '='); // A lone "-" before "=" is deleted.
+
+        console.log(operation);
 
 }
 
@@ -169,8 +179,6 @@ function displayOperation(operation) {
 }
 
 function displayResult(result) {
-
-    console.log(result);
 
     if (result > 100000000) {
         
@@ -205,7 +213,7 @@ function calculate(operation) {
 
     result = convertInput(operation).slice(0, convertInput(operation).length - 1);
 
-    //If PEMDAS is used, the '*', '/' and '%' happen before the '+' and '-'.
+    //If PEMDAS is enabled, the '*', '/' and '%' are calculated before the '+' and '-'.
     if (pemdas) {
         result = applyPEMDAS(result);
     }
