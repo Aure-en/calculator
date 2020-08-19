@@ -76,13 +76,20 @@ body {
 
     /*Calculator Header*/
 
+.calculator__header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    padding-left: 0.3em;
+}
+
 .calculator__menu {
     display: grid;
-    grid-template-columns: repeat(2, auto) 1fr repeat(3, auto);
+    grid-template-columns: auto 1fr repeat(3, auto);
     height: 100%;
     align-items: center;
     grid-gap: 0.2em;
-    padding-left: 0.2em;
+    padding: 0 0.3em;
 }
 
 .calculator__menu li:hover {
@@ -99,23 +106,28 @@ body {
 }
 
 .calculator__menu_minimize {
-    grid-column: 4;
+    grid-column: 3;
 }
 
 .calculator__menu_maximize {
-    grid-column: 5;
+    grid-column: 4;
 }
 
 .calculator__menu_close {
-    grid-column: 6;
+    grid-column: 5;
 }
 
-.calculator__header_pemdas {
+.calculator__menu_pemdas,
+.calculator__menu_icon {
     font-size: 0.8em;
+    
+}
+
+.calculator__menu_pemdas {
     text-decoration: line-through;
 }
 
-#pemdas:checked + .calculator__header_pemdas {
+#pemdas:checked + .calculator__menu_pemdas {
     text-decoration: none;
 }
 
@@ -169,8 +181,8 @@ body {
 .calculator__operators_top,
 .calculator__operators_right,
 .calculator__menu,
-.calculator__header_light,
-.calculator__header_pemdas {
+.calculator__menu_pemdas,
+.calculator__menu_icon {
     color: #e6e1dc;
 }
 
@@ -290,11 +302,9 @@ body {
     display: none;
 }
 
-    /*Dark theme*/
-
 /*On phones, the calculator takes up all the space*/
 
-@media all and (max-device-width: 360px) and (max-device-height: 640px) {
+@media all and (max-device-width: 400px) and (max-device-height: 800px) {
     .calculator__window {
         width: 100%;
         height: 100%;
