@@ -13,108 +13,75 @@ let result = 0;
 function input(event) {
 
     if (event.target.tagName != 'LI') return;
-    
-    //If we start with an operator, the calculator uses the previous result as the first operande.
-    if (operation == '' && event.target.innerHTML.match(/[+÷✕‒%]/)) {
-        operation = result + event.target.innerHTML;
-        return;
-    }
-
-    //If we already have an operator but press on another operator, it replaces the old one.
-    if (/[+÷✕‒%]$/.test(operation) && event.target.innerHTML.match(/[+÷✕‒%]/)) {
-        operation = operation.replace(/[+÷✕‒%]$/, event.target.innerHTML);
-        return;
-    }
-
-    //If we have 0. and press on an operator, it is replaced by 0.
-    if (/0\.$/.test(operation) && event.target.innerHTML.match(/[+÷✕‒%]/)) {
-        operation = operation.replace(/0\.$/, 0 + event.target.innerHTML);
-        return;
-    }
-
-    //If our operande already has a '.', we cannot add another one.
-    if (/\d+\.\d*$/.test(operation) && event.target.innerHTML == '.') return;
-
-    //If we start a new operation, it replaces the previous one.
-    if (/=$/.test(operation) && /[±0-9]/.test(event.target.innerHTML)) {
-        operation = event.target.innerHTML;
-        return;
-    }
-
-    if (/=$/.test(operation) && event.target.innerHTML == '.') {
-        operation = 0 + event.target.innerHTML;
-        return;
-    }
-
-    if (/=$/.test(operation) && /[+÷✕‒%]/.test(event.target.innerHTML)) {
-        operation = result + event.target.innerHTML;
-        return;
-    }
-
-    //If we press several 0 in a row before any '.', they are ignored.
-    if (event.target.innerHTML == '0' && /\b0$/.test(operation)) return;
-
-    //If we press '.' without any digit before it, a 0 is added.
-    if (event.target.innerHTML == '.' && (/[+÷✕‒%]$/.test(operation) || operation == '') ) {
-        operation += 0 + event.target.innerHTML;
-        return;
-    }
-
-    //Pressing special keys :
 
         //Clear
     if (event.target.innerHTML == 'AC') {
-        operation = '';
-        result = '';
-        displayResult(result);
+        clear();
         return;
     }
 
         //Erase
     if (event.target.innerHTML == '🡐') {
-        operation = operation.slice(0, operation.length - 1);
+        erase();
         return;
     }
+
+
+        //Default
+    operation += event.target.innerHTML;  
+    fixInput();
+    displayOperation(operation);
 
         //Equal
     if (event.target.innerHTML == '=') {
 
-
-        if (/=/.test(operation)) return;
-        if (/[+÷✕‒%]$/.test(operation)) return;
-        if (/\.$/.test(operation)) operation += 0;
-        console.log((/0\.$/.test(operation)));
-        if (/0\.0$/.test(operation)) {
-            console.log(operation);
-            operation = operation.replace(/0\.0$/, `0${event.target.innerHTML}`);
-            console.log(operation);
-        }
-
         if (!checkOperation(operation)) {
             displayResult("Error: cannot divide by 0.");
+            result = 0;
+            return;
+        }
+
+        if (/[+÷✕‒%]=$/.test(operation)) {
+            operation = operation.slice(0, operation.length - 1);
             return;
         }
 
         calculate(operation);
+        operation = '';
         displayResult(result);
         
     }    
 
-    //If there is a lone 0, it is replaced.
-    if (/\b0$/.test(operation)) {
-        operation = operation.replace(/\b0$/, event.target.innerHTML);
-        return;
-    }
+}
 
-    //Default
-    operation += event.target.innerHTML;    
+function erase() {
+    return operation = operation.slice(0, operation.length - 1);
+}
+
+function clear() {
+    operation = '';
+    result = '';
+    displayResult(result);
+}
+
+function fixInput() {
+
+    operation = operation.replace(/[+÷✕‒%]+([+÷✕‒%])/g, '$1')
+        .replace(/^([+÷✕‒%])/, `${result}$1`) // A lone operator is replaced by result, followed by the operator.
+        .replace(/(^|[+÷✕‒%])\./, '$10.') // '.' is replaced by "0."
+        .replace(/\b0\.([+÷✕‒%])/, '0$1') // "0.", followed by an operator, is replaced by "0"
+        .replace(/(\d+\.(\d+)?)\./, '$1') // Only allows one '.' per number.
+        .replace(/(^|\b)0+\./, '0.') // Multiple "0" before a . are replaced by only one "0".
+        .replace(/([+÷✕‒%])\./, '$1',) // A "." following an operator is replaced by "0."
+        .replace(/(^|[+÷✕‒%])0+([0-9])/, '$1$2') // If there are some "0" before a number, they are deleted.
+        .replace(/0\.=/, '0=') // If "=" follows "0.", it is replaced by "0".
 
 }
 
 function convertInput(operation) {
     return operation.replace(/[‒±]/g, '-')
         .replace(/÷/g, '/')
-        .replace(/✕/g, '*')
+        .replace(/✕/g, '*');
 }
 
     /*Display related functions*/
@@ -129,13 +96,28 @@ function displayOperation(operation) {
 }
 
 function displayResult(result) {
+
+    if (result > 100000000) {
+        
+        if (/\./.test(result)) {
+            result = Number(result).toExponential(5);
+        } else {
+            result = Number(result) .toExponential(5);
+        }
+
+    }
+
+    if (result.toString().length > 10) {
+        result = Number(result).toFixed(5);
+    }
+
         document.querySelector('.calculator__display_result').innerHTML = result;
 }
 
     /*Calculations related functions*/
 
 function checkOperation(operation) {
-    if (/÷0\b/.test(operation)) {
+    if (/÷0(\b|$)/.test(operation)) {
         return false;
     }
     return true;
@@ -143,7 +125,7 @@ function checkOperation(operation) {
 
 function calculate(operation) {
 
-    result = convertInput(operation);
+    result = convertInput(operation).slice(0, convertInput(operation).length - 1);
 
     while (!/^-?\d+(\.\d+)?$/.test(result)) {
         result = result.replace(/((?:-?\d+)(?:\.\d+)?)([-+/*%])((?:-?\d+)(?:\.\d+)?)/, (match, a, operator, b) => operate(+a, +b, operator));
@@ -185,4 +167,3 @@ function modulo(a, b) {
 /*Event Listeners*/
 
 calculator.addEventListener("click", input);
-calculator.addEventListener("click", () => displayOperation(operation));
