@@ -6,7 +6,7 @@ let operation = '';
 let display = '';
 let result = 0;
 
-function input(event) {
+function inputMouse(event) {
 
     if (event.target.tagName != 'LI') return;
 
@@ -29,29 +29,85 @@ function input(event) {
 
         //Equal
     if (event.target.innerHTML == '=') {
-
-        if (!checkOperation(operation)) {
-            displayResult("Error: cannot divide by 0.");
-            result = 0;
-            operation = '';
-            return;
-        }
-
-        if (/[+÷✕‒%]=$/.test(operation)) {
-            operation = operation.slice(0, operation.length - 1);
-            return;
-        }
-
-        calculate(operation);
-        operation = '';
-        displayResult(result);
-        
+        equal();
     }    
 
 }
 
+function inputKeyboard(event) {
+
+    console.log(event.key);
+
+    //Clear
+    if (event.key == "Escape") {
+        styleKey(document.querySelector('.calculator__operators_clear'));
+        clear();
+        return;
+    }
+
+    //Erase
+    if (event.key == "Backspace") {
+        styleKey(document.querySelector('.calculator__operators_erase'));
+        erase();
+        return;
+    }
+
+    //Special operators
+    if (event.key == "/") {
+        processInput("÷", document.querySelector('.calculator__operators_divide'));
+        return;
+    }
+
+    if (event.key == "*") {
+        processInput("✕", document.querySelector('.calculator__operators_multiply'));
+        return;
+    }
+
+    if (event.key == "-") {
+        processInput("‒", document.querySelector('.calculator__operators_substract'));
+        return;
+    }
+
+    if (event.key == "+") {
+        processInput("+", document.querySelector('.calculator__operators_add'));
+    }
+
+    if (event.key == "%") {
+        processInput("%", document.querySelector('.calculator__operators_modulo'));
+    }
+
+    if (event.key == ".") {
+        processInput(".", document.querySelector('.calculator__numbers_dot'));
+    }   
+
+    //Equal
+    if (event.key == "Enter" || event.key == "=") {
+        processInput("=", document.querySelector('.calculator__numbers_dot'));
+        equal();
+    }
+
+    //Default
+    if (/^[0-9]$/.test(event.key)) {
+        processInput(event.key, document.querySelector(`.calculator__numbers_${event.key}`));
+    }
+
+    function processInput(value, element) {
+        styleKey(element);
+        operation += value;
+        fixInput();
+        displayOperation(operation);
+    }
+
+}
+
+function styleKey(key) {
+    key.classList.add("keydown");
+    setTimeout(() => key.classList.remove("keydown"), 100);
+}
+
 function erase() {
-    return operation = operation.slice(0, operation.length - 1);
+    operation = operation.slice(0, operation.length - 1);
+    displayOperation(operation);
 }
 
 function clear() {
@@ -59,6 +115,26 @@ function clear() {
     result = 0;
     displayResult(result);
     displayOperation(operation);
+}
+
+function equal() {
+
+    if (!checkOperation(operation)) {
+        displayResult("Error: cannot divide by 0.");
+        result = 0;
+        operation = '';
+        return;
+    }
+
+    if (/[+÷✕‒%]=$/.test(operation)) {
+        operation = operation.slice(0, operation.length - 1);
+        return;
+    }
+
+    calculate(operation);
+    operation = '';
+    displayResult(result);
+
 }
 
 function fixInput() {
@@ -268,8 +344,9 @@ function replaceCalculator(event) {
 
 /*Event Listeners*/
 
-    //Input operators/operandes when pressing keys
-calculator.addEventListener("click", input);
+    //Input operators/operandes when pressing keys with the mouse and keyboard.
+calculator.addEventListener("click", inputMouse);
+window.addEventListener("keydown", inputKeyboard);
 
     //Prevent the text from being selected when pressing keys
 document.querySelectorAll('li').forEach( li => li.onmousedown = function(e) { e.preventDefault(); });
