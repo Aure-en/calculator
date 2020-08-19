@@ -1,7 +1,3 @@
-/*Main Elements*/
-
-let calculator = document.querySelector(".calculator__main");
-
 /*Functions*/
 
     /*Input related functions*/
@@ -38,6 +34,7 @@ function input(event) {
         if (!checkOperation(operation)) {
             displayResult("Error: cannot divide by 0.");
             result = 0;
+            operation = '';
             return;
         }
 
@@ -60,8 +57,9 @@ function erase() {
 
 function clear() {
     operation = '';
-    result = '';
+    result = 0;
     displayResult(result);
+    displayOperation(operation);
 }
 
 function fixInput() {
@@ -84,7 +82,7 @@ function convertInput(operation) {
         .replace(/✕/g, '*');
 }
 
-    /*Display related functions*/
+    /*Calculator display related functions*/
 
 function displayOperation(operation) {
     display = operation.replace(/\//g, '÷')
@@ -97,6 +95,8 @@ function displayOperation(operation) {
 
 function displayResult(result) {
 
+    console.log(result);
+
     if (result > 100000000) {
         
         if (/\./.test(result)) {
@@ -107,7 +107,7 @@ function displayResult(result) {
 
     }
 
-    if (result.toString().length > 10) {
+    if (/\.\d{6,}$/.test(result)) {
         result = Number(result).toFixed(5);
     }
 
@@ -115,6 +115,9 @@ function displayResult(result) {
 }
 
     /*Calculations related functions*/
+
+let pemdas = false;
+let number = '-?\\d+(?:\\.\\d+)?(?:e\\+\\d+)?';
 
 function checkOperation(operation) {
     if (/÷0(\b|$)/.test(operation)) {
@@ -127,12 +130,27 @@ function calculate(operation) {
 
     result = convertInput(operation).slice(0, convertInput(operation).length - 1);
 
-    while (!/^-?\d+(\.\d+)?$/.test(result)) {
-        result = result.replace(/((?:-?\d+)(?:\.\d+)?)([-+/*%])((?:-?\d+)(?:\.\d+)?)/, (match, a, operator, b) => operate(+a, +b, operator));
+    //If PEMDAS is used, the '*', '/' and '%' happen before the '+' and '-'.
+    if (pemdas) {
+        result = applyPEMDAS(result);
+    }
+
+    while (!new RegExp(`^${number}$`).test(result)) {
+        result = result.replace(new RegExp(`(${number})([-+*/%])(${number})`), (match, a, operator, b) => operate(+a, +b, operator));
     }
 
     return result;
 
+}
+
+function applyPEMDAS(operation) {
+
+    return operation.replace(new RegExp(`(${number})([*/%])(${number})`), (match, a, operator, b) => operate(+a, +b, operator));
+
+}
+
+function togglePEMDAS() {
+    pemdas = !pemdas;
 }
 
 function operate(a, b, operator) {
@@ -164,6 +182,89 @@ function modulo(a, b) {
     return a % b;
 }
 
+    /*General display related functions*/
+
+let calculator = document.querySelector(".calculator__main");
+let calculatorWindow = document.querySelector('.calculator__window');
+let calculatorMain = document.querySelector('.calculator__main');
+let prevX;
+let prevY;
+
+function maximize() {
+    if (!calculatorWindow.classList.contains('maximize')) {
+        prevX = calculatorWindow.style.left;
+        prevY = calculatorWindow.style.top;
+        console.log(prevX, prevY);
+        calculatorWindow.style.left = 0;
+        calculatorWindow.style.top = 0;
+    } else {
+        calculatorWindow.style.left = prevX;
+        calculatorWindow.style.top = prevY;
+    }
+
+    calculatorWindow.classList.toggle('maximize');
+    calculatorMain.classList.toggle("maximize");
+    calculatorWindow.classList.remove("minimize");
+    calculatorMain.classList.remove("minimize");
+
+}
+
+function minimize() {
+    calculatorWindow.classList.toggle("minimize");
+    calculatorMain.classList.toggle("minimize");
+    calculatorWindow.classList.remove("maximize");
+    calculatorMain.classList.remove("maximize");
+    calculatorWindow.style.left = prevX;
+    calculatorWindow.style.top = prevY;
+
+}
+
+function drag(event) {
+    let shiftX = event.clientX - calculatorWindow.getBoundingClientRect().left;
+    let shiftY = event.clientY - calculatorWindow.getBoundingClientRect().top;
+    moveAt(event.pageX, event.pageY);
+
+    function moveAt(pageX, pageY) {
+
+        let left = pageX - shiftX;
+        if (left < 0) left = 0;
+        if (left > document.documentElement.clientWidth - calculatorWindow.offsetWidth) left = window.clientWidth - calculatorWindow.offsetWidth;
+
+        let top = pageY - shiftY;
+        if (top < 0) top = 0;
+        if (top > document.documentElement.clientHeight - calculatorWindow.offsetHeight) top = document.documentElement.clientHeight - calculatorWindow.offsetHeight;
+
+        calculatorWindow.style.left = left + 'px';
+        calculatorWindow.style.top = top + 'px';
+    }
+
+    function onMouseMove(event) {
+        moveAt(event.pageX, event.pageY);
+        prevX = calculatorWindow.style.left;
+        prevY = calculatorWindow.style.top;
+    }
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.onmouseup = function() {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.onmouseup = null;
+    }
+
+}
+
 /*Event Listeners*/
 
 calculator.addEventListener("click", input);
+
+document.querySelector('#pemdas').addEventListener("change", togglePEMDAS);
+document.querySelector('.calculator__menu_maximize').addEventListener("click", maximize);
+document.querySelector('.calculator__menu_minimize').addEventListener("click", minimize);
+document.querySelector('.calculator__header').addEventListener("dblclick", function(event) {
+    if (event.target.closest('li')) return;
+    maximize();
+});
+
+document.querySelectorAll('li').forEach( li => li.onmousedown = function(e) { e.preventDefault(); });
+
+document.querySelector('.calculator__header').addEventListener("mousedown", drag);
+calculatorWindow.ondragstart = function() { return false; };
