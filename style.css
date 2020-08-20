@@ -342,6 +342,11 @@ body {
 /*On smaller devices, the calculator takes up all the space*/
 
 @media all and (max-device-width: 500px) and (max-device-height: 800px) {
+
+    .body {
+        height: calc(100vh - calc(100vh - 100%));
+    }
+
     .calculator__window {
         width: 100%;
         height: 100%;
