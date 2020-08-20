@@ -36,8 +36,6 @@ function inputMouse(event) {
 
 function inputKeyboard(event) {
 
-    console.log(event.key);
-
     //Clear
     if (event.key == "Escape") {
         styleKey(document.querySelector('.calculator__operators_clear'));
@@ -82,7 +80,7 @@ function inputKeyboard(event) {
 
     //Equal
     if (event.key == "Enter" || event.key == "=") {
-        processInput("=", document.querySelector('.calculator__numbers_dot'));
+        processInput("=", document.querySelector('.calculator__operators_equal'));
         equal();
     }
 
@@ -115,6 +113,7 @@ function clear() {
     result = 0;
     displayResult(result);
     displayOperation(operation);
+    resetPosition();
 }
 
 function equal() {
@@ -140,6 +139,7 @@ function equal() {
     calculate(operation);
     operation = '';
     displayResult(result);
+    resetPosition();
 
 }
 
@@ -157,8 +157,6 @@ function fixInput() {
         .replace(/±{2,}/, '±') // Only allows 1 "-" in front of each number.
         .replace(/±=/, '='); // A lone "-" before "=" is deleted.
 
-        console.log(operation);
-
 }
 
 function convertInput(operation) {
@@ -169,13 +167,21 @@ function convertInput(operation) {
 
     /*Calculator display related functions*/
 
+let calculatorDisplayOperation = document.querySelector('.calculator__display_operation');
+let calculatorDisplayResult = document.querySelector('.calculator__display_result');
+let calculatorDisplay = document.querySelector('.calculator__display');
+let arrowLeft = document.querySelector('.calculator__display_arrow_left');
+let arrowRight = document.querySelector('.calculator__display_arrow_right');
+let currentPosition = 0;
+
+        //General display
 function displayOperation(operation) {
     display = operation.replace(/\//g, '÷')
         .replace(/\*/g, '✕')
         .replace(/\-/g, '‒')
         .replace(/±/g, '-')
         .replace(/([+÷✕‒%=])/g, ' $1 ');
-    document.querySelector('.calculator__display_operation').innerHTML = display;     
+    calculatorDisplayOperation.innerHTML = display;
 }
 
 function displayResult(result) {
@@ -195,6 +201,62 @@ function displayResult(result) {
     }
 
         document.querySelector('.calculator__display_result').innerHTML = result;
+}
+
+        //In case of overflow
+function checkOverflow() {
+    
+    if (calculatorDisplay.clientWidth < calculatorDisplayOperation.offsetWidth) return true;
+    return false;
+}
+
+function displayArrows() {
+
+    if (checkOverflow()) {
+        arrowLeft.classList.remove('hidden');
+        arrowRight.classList.remove('hidden');
+    } else {
+        arrowLeft.classList.add('hidden');
+        arrowRight.classList.add('hidden');
+        resetPosition();
+    }
+}
+
+function resetPosition() {
+    currentPosition = 0;
+    calculatorDisplayOperation.style.transform = '';
+    calculatorDisplayResult.style.transform = '';
+}
+
+function scrollRight() {
+    if (-currentPosition >= calculatorDisplayOperation.offsetWidth - calculatorDisplay.clientWidth) return;
+    currentPosition -= calculatorDisplay.clientWidth;
+    calculatorDisplayOperation.style.transform = `translateX(${currentPosition}px)`;
+}
+
+function scrollLeft() {
+    console.log(currentPosition, calculatorDisplay.clientWidth);
+    if (currentPosition == 0) return;
+
+    if (currentPosition > calculatorDisplay.clientWidth) {
+        currentPosition -= calculatorDisplay.clientWidth;
+        calculatorDisplayOperation.style.transform = `translateX(${-currentPosition}px)`;
+    } else {
+        currentPosition = 0;
+        calculatorDisplayOperation.style.transform = '';
+    }
+
+}
+
+function scrollOverflow() {
+
+    if (event.type.includes("click") && event.target.tagName != "LI") return;
+    console.log(currentPosition);
+    if (calculatorDisplayOperation.offsetWidth > calculatorDisplay.clientWidth) {
+        currentPosition = calculatorDisplayOperation.offsetWidth - calculatorDisplay.clientWidth;
+        calculatorDisplayOperation.style.transform = `translateX(${-currentPosition}px)`;
+        calculatorDisplayResult.style.transform = `translateX(${-currentPosition}px)`;
+    }
 }
 
     /*Calculations related functions*/
@@ -226,14 +288,12 @@ function calculate(operation) {
 
 }
 
-function applyPEMDAS(operation) {
-
-    return operation.replace(new RegExp(`(${number})([*/%])(${number})`), (match, a, operator, b) => operate(+a, +b, operator));
-
-}
-
 function togglePEMDAS() {
     pemdas = !pemdas;
+}
+
+function applyPEMDAS(operation) {
+    return operation.replace(new RegExp(`(${number})([*/%])(${number})`), (match, a, operator, b) => operate(+a, +b, operator));
 }
 
 function operate(a, b, operator) {
@@ -277,7 +337,6 @@ function maximize() {
     if (!calculatorWindow.classList.contains('maximize')) {
         prevX = calculatorWindow.style.left;
         prevY = calculatorWindow.style.top;
-        console.log(prevX, prevY);
         calculatorWindow.style.left = 0;
         calculatorWindow.style.top = 0;
     } else {
@@ -355,6 +414,16 @@ function replaceCalculator(event) {
     //Input operators/operandes when pressing keys with the mouse and keyboard.
 calculator.addEventListener("click", inputMouse);
 window.addEventListener("keydown", inputKeyboard);
+calculator.addEventListener("click", scrollOverflow);
+window.addEventListener("keydown", scrollOverflow);
+
+    //Makes the scrolling arrows appear when the operation overflows.
+calculator.addEventListener("click", displayArrows);
+window.addEventListener("keydown", displayArrows);
+
+    //Allow the user to scroll when the operation overflows.
+arrowLeft.addEventListener("click", scrollLeft);
+arrowRight.addEventListener("click", scrollRight);
 
     //Prevent the text from being selected when pressing keys
 document.querySelectorAll('li').forEach( li => li.onmousedown = function(e) { e.preventDefault(); });
