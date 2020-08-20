@@ -196,6 +196,12 @@ body {
     position: absolute;
     top: 2.5em;
     padding: 0.2em 0.4em;
+    color: #51505f;
+}
+
+.calculator__display_arrow_left:hover,
+.calculator__display_arrow_right:hover {
+    color: #000;
 }
 
 .calculator__display_arrow_left.hidden,
@@ -205,6 +211,10 @@ body {
 
 .calculator__display_arrow_right {
     right: 0;
+}
+
+.calculator__display_arrow_left {
+    left: 0;
 }
 
     /*Calculator Keys*/

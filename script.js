@@ -235,7 +235,6 @@ function scrollRight() {
 }
 
 function scrollLeft() {
-    console.log(currentPosition, calculatorDisplay.clientWidth);
     if (currentPosition == 0) return;
 
     if (currentPosition > calculatorDisplay.clientWidth) {
@@ -251,7 +250,6 @@ function scrollLeft() {
 function scrollOverflow() {
 
     if (event.type.includes("click") && event.target.tagName != "LI") return;
-    console.log(currentPosition);
     if (calculatorDisplayOperation.offsetWidth > calculatorDisplay.clientWidth) {
         currentPosition = calculatorDisplayOperation.offsetWidth - calculatorDisplay.clientWidth;
         calculatorDisplayOperation.style.transform = `translateX(${-currentPosition}px)`;
@@ -414,6 +412,8 @@ function replaceCalculator(event) {
     //Input operators/operandes when pressing keys with the mouse and keyboard.
 calculator.addEventListener("click", inputMouse);
 window.addEventListener("keydown", inputKeyboard);
+
+    //Scroll automatically when the input overflows.
 calculator.addEventListener("click", scrollOverflow);
 window.addEventListener("keydown", scrollOverflow);
 
@@ -424,6 +424,12 @@ window.addEventListener("keydown", displayArrows);
     //Allow the user to scroll when the operation overflows.
 arrowLeft.addEventListener("click", scrollLeft);
 arrowRight.addEventListener("click", scrollRight);
+window.addEventListener("keydown", () => {
+    if (event.code == "ArrowLeft") scrollLeft();
+});
+window.addEventListener("keydown", () => {
+    if (event.code == "ArrowRight") scrollRight();
+})
 
     //Prevent the text from being selected when pressing keys
 document.querySelectorAll('li').forEach( li => li.onmousedown = function(e) { e.preventDefault(); });
