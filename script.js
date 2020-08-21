@@ -279,6 +279,7 @@ function calculate(operation) {
 
     result = convertInput(operation).slice(0, convertInput(operation).length - 1);
 
+    console.log(pemdas);
     //If PEMDAS is enabled, the "*", "/" and "%" are calculated before the "+" and "-".
     if (pemdas) {
         result = applyPEMDAS(result);
@@ -297,7 +298,14 @@ function togglePEMDAS() {
 }
 
 function applyPEMDAS(operation) {
-    return operation.replace(new RegExp(`(${number})([*/%])(${number})`), (match, a, operator, b) => operate(+a, +b, operator));
+    let operationPEMDAS = operation;
+
+    while (/[*/%]/.test(operationPEMDAS)) {
+        operationPEMDAS = operationPEMDAS.replace(new RegExp(`(${number})([*/%])(${number})`, 'g'), (match, a, operator, b) => operate(+a, +b, operator));
+    }
+
+    return operationPEMDAS;
+
 }
 
 function operate(a, b, operator) {
