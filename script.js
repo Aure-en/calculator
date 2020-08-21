@@ -2,22 +2,22 @@
 
     /*Input related functions*/
 
-let operation = '';
-let display = '';
+let operation = "";
+let display = "";
 let result = 0;
 
 function inputMouse(event) {
 
-    if (event.target.tagName != 'LI') return;
+    if (event.target.tagName != "LI") return;
 
         //Clear
-    if (event.target.innerHTML == 'AC') {
+    if (event.target.innerHTML == "AC") {
         clear();
         return;
     }
 
         //Erase
-    if (event.target.innerHTML == '🡐') {
+    if (event.target.innerHTML == "🡐") {
         erase();
         return;
     }
@@ -28,7 +28,7 @@ function inputMouse(event) {
     displayOperation(operation);
 
         //Equal
-    if (event.target.innerHTML == '=') {
+    if (event.target.innerHTML == "=") {
         equal();
     }    
 
@@ -38,49 +38,49 @@ function inputKeyboard(event) {
 
     //Clear
     if (event.key == "Escape") {
-        styleKey(document.querySelector('.calculator__operators_clear'));
+        styleKey(document.querySelector(".calculator__operators_clear"));
         clear();
         return;
     }
 
     //Erase
     if (event.key == "Backspace") {
-        styleKey(document.querySelector('.calculator__operators_erase'));
+        styleKey(document.querySelector(".calculator__operators_erase"));
         erase();
         return;
     }
 
     //Special operators
     if (event.key == "/") {
-        processInput("÷", document.querySelector('.calculator__operators_divide'));
+        processInput("÷", document.querySelector(".calculator__operators_divide"));
         return;
     }
 
     if (event.key == "*") {
-        processInput("✕", document.querySelector('.calculator__operators_multiply'));
+        processInput("✕", document.querySelector(".calculator__operators_multiply"));
         return;
     }
 
     if (event.key == "-") {
-        processInput("‒", document.querySelector('.calculator__operators_substract'));
+        processInput("‒", document.querySelector(".calculator__operators_substract"));
         return;
     }
 
     if (event.key == "+") {
-        processInput("+", document.querySelector('.calculator__operators_add'));
+        processInput("+", document.querySelector(".calculator__operators_add"));
     }
 
     if (event.key == "%") {
-        processInput("%", document.querySelector('.calculator__operators_modulo'));
+        processInput("%", document.querySelector(".calculator__operators_modulo"));
     }
 
     if (event.key == ".") {
-        processInput(".", document.querySelector('.calculator__numbers_dot'));
+        processInput(".", document.querySelector(".calculator__numbers_dot"));
     }   
 
     //Equal
     if (event.key == "Enter" || event.key == "=") {
-        processInput("=", document.querySelector('.calculator__operators_equal'));
+        processInput("=", document.querySelector(".calculator__operators_equal"));
         equal();
     }
 
@@ -109,7 +109,7 @@ function erase() {
 }
 
 function clear() {
-    operation = '';
+    operation = "";
     result = 0;
     displayResult(result);
     displayOperation(operation);
@@ -118,16 +118,16 @@ function clear() {
 
 function equal() {
 
-    if (operation == '=') {
-        operation = '';
-        displayResult('');
+    if (operation == "=") {
+        operation = "";
+        displayResult("");
         return;
     }
 
     if (!checkOperation(operation)) {
         displayResult("Error: cannot divide by 0.");
         result = 0;
-        operation = '';
+        operation = "";
         return;
     }
 
@@ -137,7 +137,7 @@ function equal() {
     }
 
     calculate(operation);
-    operation = '';
+    operation = "";
     displayResult(result);
     resetPosition();
 
@@ -145,42 +145,42 @@ function equal() {
 
 function fixInput() {
 
-    operation = operation.replace(/[+÷✕‒%]+([+÷✕‒%])/g, '$1')
+    operation = operation.replace(/[+÷✕‒%]+([+÷✕‒%])/g, "$1")
         .replace(/^([+÷✕‒%])/, `${result}$1`) // A lone operator is replaced by result, followed by the operator.
-        .replace(/(^|[+÷✕‒%])\./, '$10.') // '.' is replaced by "0."
-        .replace(/\b0\.([+÷✕‒%])/, '0$1') // "0.", followed by an operator, is replaced by "0"
-        .replace(/(\d+\.(\d+)?)\./, '$1') // Only allows one '.' per number.
-        .replace(/(^|\b)0+\./, '0.') // Multiple "0" before a . are replaced by only one "0".
-        .replace(/([+÷✕‒%])\./, '$1',) // A "." following an operator is replaced by "0."
-        .replace(/(^|[+÷✕‒%])0+([0-9])/, '$1$2') // If there are some "0" before a number, they are deleted.
-        .replace(/0\.=/, '0=') // If "=" follows "0.", it is replaced by "0".
-        .replace(/±{2,}/, '±') // Only allows 1 "-" in front of each number.
-        .replace(/±=/, '='); // A lone "-" before "=" is deleted.
+        .replace(/(^|[+÷✕‒%])\./, "$10.") // "." is replaced by "0."
+        .replace(/\b0\.([+÷✕‒%])/, "0$1") // "0.", followed by an operator, is replaced by "0"
+        .replace(/(\d+\.(\d+)?)\./, "$1") // Only allows one "." per number.
+        .replace(/(^|\b)0+\./, "0.") // Multiple "0" before a . are replaced by only one "0".
+        .replace(/([+÷✕‒%])\./, "$1",) // A "." following an operator is replaced by "0."
+        .replace(/(^|[+÷✕‒%])0+([0-9])/, "$1$2") // If there are some "0" before a number, they are deleted.
+        .replace(/0\.=/, "0=") // If "=" follows "0.", it is replaced by "0".
+        .replace(/±{2,}/, "±") // Only allows 1 "-" in front of each number.
+        .replace(/±=/, "="); // A lone "-" before "=" is deleted.
 
 }
 
 function convertInput(operation) {
-    return operation.replace(/[‒±]/g, '-')
-        .replace(/÷/g, '/')
-        .replace(/✕/g, '*');
+    return operation.replace(/[‒±]/g, "-")
+        .replace(/÷/g, "/")
+        .replace(/✕/g, "*");
 }
 
     /*Calculator display related functions*/
 
-let calculatorDisplayOperation = document.querySelector('.calculator__display_operation');
-let calculatorDisplayResult = document.querySelector('.calculator__display_result');
-let calculatorDisplay = document.querySelector('.calculator__display');
-let arrowLeft = document.querySelector('.calculator__display_arrow_left');
-let arrowRight = document.querySelector('.calculator__display_arrow_right');
+let calculatorDisplayOperation = document.querySelector(".calculator__display_operation");
+let calculatorDisplayResult = document.querySelector(".calculator__display_result");
+let calculatorDisplay = document.querySelector(".calculator__display");
+let arrowLeft = document.querySelector(".calculator__display_arrow_left");
+let arrowRight = document.querySelector(".calculator__display_arrow_right");
 let currentPosition = 0;
 
         //General display
 function displayOperation(operation) {
-    display = operation.replace(/\//g, '÷')
-        .replace(/\*/g, '✕')
-        .replace(/\-/g, '‒')
-        .replace(/±/g, '-')
-        .replace(/([+÷✕‒%=])/g, ' $1 ');
+    display = operation.replace(/\//g, "÷")
+        .replace(/\*/g, "✕")
+        .replace(/\-/g, "‒")
+        .replace(/±/g, "-")
+        .replace(/([+÷✕‒%=])/g, " $1 ");
     calculatorDisplayOperation.innerHTML = display;
 }
 
@@ -200,7 +200,7 @@ function displayResult(result) {
         result = Number(result).toFixed(5);
     }
 
-        document.querySelector('.calculator__display_result').innerHTML = result;
+        document.querySelector(".calculator__display_result").innerHTML = result;
 }
 
         //In case of overflow
@@ -213,43 +213,49 @@ function checkOverflow() {
 function displayArrows() {
 
     if (checkOverflow()) {
-        arrowLeft.classList.remove('hidden');
-        arrowRight.classList.remove('hidden');
+        arrowLeft.classList.remove("hidden");
+        arrowRight.classList.remove("hidden");
     } else {
-        arrowLeft.classList.add('hidden');
-        arrowRight.classList.add('hidden');
+        arrowLeft.classList.add("hidden");
+        arrowRight.classList.add("hidden");
         resetPosition();
     }
 }
 
 function resetPosition() {
     currentPosition = 0;
-    calculatorDisplayOperation.style.transform = '';
-    calculatorDisplayResult.style.transform = '';
+    calculatorDisplayOperation.style.transform = "";
+    calculatorDisplayResult.style.transform = "";
 }
 
 function scrollRight() {
-    if (-currentPosition >= calculatorDisplayOperation.offsetWidth - calculatorDisplay.clientWidth) return;
-    currentPosition -= calculatorDisplay.clientWidth;
-    calculatorDisplayOperation.style.transform = `translateX(${currentPosition}px)`;
+    console.log(currentPosition, calculatorDisplayOperation.offsetWidth, calculatorDisplay.clientWidth);
+    if (currentPosition >= calculatorDisplayOperation.offsetWidth - calculatorDisplay.clientWidth) return;
+    currentPosition += calculatorDisplay.clientWidth;
+    calculatorDisplayOperation.style.transform = `translateX(${-currentPosition}px)`;
+    console.log(currentPosition, calculatorDisplayOperation.offsetWidth, calculatorDisplay.clientWidth);
 }
 
 function scrollLeft() {
+    console.log(currentPosition, calculatorDisplayOperation.offsetWidth, calculatorDisplay.clientWidth);
     if (currentPosition == 0) return;
 
-    if (currentPosition > calculatorDisplay.clientWidth) {
+    if (currentPosition >= calculatorDisplay.clientWidth) {
         currentPosition -= calculatorDisplay.clientWidth;
         calculatorDisplayOperation.style.transform = `translateX(${-currentPosition}px)`;
     } else {
         currentPosition = 0;
-        calculatorDisplayOperation.style.transform = '';
+        calculatorDisplayOperation.style.transform = "";
     }
+    console.log(currentPosition, calculatorDisplayOperation.offsetWidth, calculatorDisplay.clientWidth);
 
 }
 
 function scrollOverflow() {
 
     if (event.type.includes("click") && event.target.tagName != "LI") return;
+    if (event.type == "keydown" && (event.code == "ArrowLeft" || event.code == "ArrowRight")) return;
+
     if (calculatorDisplayOperation.offsetWidth > calculatorDisplay.clientWidth) {
         currentPosition = calculatorDisplayOperation.offsetWidth - calculatorDisplay.clientWidth;
         calculatorDisplayOperation.style.transform = `translateX(${-currentPosition}px)`;
@@ -260,7 +266,7 @@ function scrollOverflow() {
     /*Calculations related functions*/
 
 let pemdas = false;
-let number = '-?\\d+(?:\\.\\d+)?(?:e\\+\\d+)?';
+let number = "-?\\d+(?:\\.\\d+)?(?:e\\+\\d+)?";
 
 function checkOperation(operation) {
     if (/÷0(\b|$)/.test(operation)) {
@@ -273,7 +279,7 @@ function calculate(operation) {
 
     result = convertInput(operation).slice(0, convertInput(operation).length - 1);
 
-    //If PEMDAS is enabled, the '*', '/' and '%' are calculated before the '+' and '-'.
+    //If PEMDAS is enabled, the "*", "/" and "%" are calculated before the "+" and "-".
     if (pemdas) {
         result = applyPEMDAS(result);
     }
@@ -295,11 +301,11 @@ function applyPEMDAS(operation) {
 }
 
 function operate(a, b, operator) {
-    if (operator == '+') return add(a, b);
-    if (operator == '-') return substract(a, b);
-    if (operator == '*') return multiply(a, b);
-    if (operator == '/') return divide(a, b);
-    if (operator == '%') return modulo(a, b);
+    if (operator == "+") return add(a, b);
+    if (operator == "-") return substract(a, b);
+    if (operator == "*") return multiply(a, b);
+    if (operator == "/") return divide(a, b);
+    if (operator == "%") return modulo(a, b);
 }
 
 function add(a, b) {
@@ -326,13 +332,13 @@ function modulo(a, b) {
     /*General display related functions*/
 
 let calculator = document.querySelector(".calculator__main");
-let calculatorWindow = document.querySelector('.calculator__window');
-let calculatorMain = document.querySelector('.calculator__main');
+let calculatorWindow = document.querySelector(".calculator__window");
+let calculatorMain = document.querySelector(".calculator__main");
 let prevX;
 let prevY;
 
 function maximize() {
-    if (!calculatorWindow.classList.contains('maximize')) {
+    if (!calculatorWindow.classList.contains("maximize")) {
         prevX = calculatorWindow.style.left;
         prevY = calculatorWindow.style.top;
         calculatorWindow.style.left = 0;
@@ -342,7 +348,7 @@ function maximize() {
         calculatorWindow.style.top = prevY;
     }
 
-    calculatorWindow.classList.toggle('maximize');
+    calculatorWindow.classList.toggle("maximize");
     calculatorMain.classList.toggle("maximize");
     calculatorWindow.classList.remove("minimize");
     calculatorMain.classList.remove("minimize");
@@ -374,8 +380,8 @@ function drag(event) {
         if (top < 0) top = 0;
         if (top > document.documentElement.clientHeight - calculatorWindow.offsetHeight) top = document.documentElement.clientHeight - calculatorWindow.offsetHeight;
 
-        calculatorWindow.style.left = left + 'px';
-        calculatorWindow.style.top = top + 'px';
+        calculatorWindow.style.left = left + "px";
+        calculatorWindow.style.top = top + "px";
     }
 
     function onMouseMove(event) {
@@ -402,8 +408,8 @@ function replaceCalculator(event) {
     if (top < 0) top = 0;
     if (top > document.documentElement.clientHeight - calculatorWindow.offsetHeight) top = document.documentElement.clientHeight - calculatorWindow.offsetHeight;
 
-    calculatorWindow.style.left = left + 'px';
-    calculatorWindow.style.top = top + 'px';
+    calculatorWindow.style.left = left + "px";
+    calculatorWindow.style.top = top + "px";
 
 }
 
@@ -412,6 +418,7 @@ function replaceCalculator(event) {
     //Input operators/operandes when pressing keys with the mouse and keyboard.
 calculator.addEventListener("click", inputMouse);
 window.addEventListener("keydown", inputKeyboard);
+window.addEventListener("keydown", () => console.log(currentPosition));
 
     //Scroll automatically when the input overflows.
 calculator.addEventListener("click", scrollOverflow);
@@ -424,7 +431,7 @@ window.addEventListener("keydown", displayArrows);
     //Allow the user to scroll when the operation overflows.
 arrowLeft.addEventListener("click", scrollLeft);
 arrowRight.addEventListener("click", scrollRight);
-window.addEventListener("keydown", () => {
+window.addEventListener("keydown", (e) => {
     if (event.code == "ArrowLeft") scrollLeft();
 });
 window.addEventListener("keydown", () => {
@@ -432,19 +439,19 @@ window.addEventListener("keydown", () => {
 })
 
     //Prevent the text from being selected when pressing keys
-document.querySelectorAll('li').forEach( li => li.onmousedown = function(e) { e.preventDefault(); });
+document.querySelectorAll("li").forEach( li => li.onmousedown = function(e) { e.preventDefault(); });
 
     //Resize calculator
-document.querySelector('#pemdas').addEventListener("change", togglePEMDAS);
-document.querySelector('.calculator__menu_maximize').addEventListener("click", maximize);
-document.querySelector('.calculator__menu_minimize').addEventListener("click", minimize);
-document.querySelector('.calculator__header').addEventListener("dblclick", function(event) {
-    if (event.target.closest('li')) return;
+document.querySelector("#pemdas").addEventListener("change", togglePEMDAS);
+document.querySelector(".calculator__menu_maximize").addEventListener("click", maximize);
+document.querySelector(".calculator__menu_minimize").addEventListener("click", minimize);
+document.querySelector(".calculator__header").addEventListener("dblclick", function(event) {
+    if (event.target.closest("li")) return;
     maximize();
 });
 
     //Move the calculator
-document.querySelector('.calculator__header').addEventListener("mousedown", drag);
+document.querySelector(".calculator__header").addEventListener("mousedown", drag);
 calculatorWindow.ondragstart = function() { return false; };
 
     //Replace the calculator when the window is resized.
