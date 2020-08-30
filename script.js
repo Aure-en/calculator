@@ -269,7 +269,7 @@ let pemdas = false;
 let number = "-?\\d+(?:\\.\\d+)?(?:e\\+\\d+)?";
 
 function checkOperation(operation) {
-    if (/÷0(\b|$)/.test(operation)) {
+    if (/(÷|%)0(\b|$)/.test(operation)) {
         return false;
     }
     return true;
